@@ -99,7 +99,7 @@ def add_cart(request, product_id):
             ex_var_list = []
             id = []
             for item in cart_item:
-                existing_variation = item.variations.all()
+                existing_variation = item.variation.all()
                 ex_var_list.append(list(existing_variation))
                 id.append(item.id)
 
