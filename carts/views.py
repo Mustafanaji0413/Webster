@@ -189,7 +189,6 @@ def cart(request, total=0, quantity=0, cart_items=None):
     return render(request, 'store/cart.html', context)
 
 
-@login_required(login_url='login')
 def checkout(request, total=0, quantity=0, cart_items=None):
     try:
         tax = 0
@@ -205,13 +204,15 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         tax = (2 * total)/100
         grand_total = total + tax
     except ObjectDoesNotExist:
-        pass #just ignore
+        pass
 
     context = {
         'total': total,
         'quantity': quantity,
         'cart_items': cart_items,
-        'tax'       : tax,
+        'tax': tax,
         'grand_total': grand_total,
+        'stripe_public_key': 'pk_test_51MeTmsLQ9eKdyL2rTjk5vewWtcciAOqsCz6dThkeGALGpkAQB1ysvvFb7FzMFe0bq5I3tnQj8DiqsyMMZGjoiqET00dj34YIVq',
+        'client_secret': 'test client secret',
     }
     return render(request, 'store/checkout.html', context)
