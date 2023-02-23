@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
-from .forms import RegistrationForm
-from .models import account
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import RegistrationForm, UserForm, UserProfileForm
+from .models import account, UserProfile
 from orders.models import Order
 from django.contrib import messages, auth
 from random import randint
@@ -214,15 +214,6 @@ def resetPassword(request):
             return redirect('resetPassword')
     else:
         return render(request, 'accounts/resetPassword.html')
-
-
-@login_required(login_url='login')
-def my_orders(request):
-    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
-    context = {
-        'orders': orders,
-    }
-    return render(request, 'accounts/my_orders.html', context)
 
 
 @login_required(login_url='login')
