@@ -9,6 +9,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponse
 from .forms import ReviewForm
 from django.contrib import messages
+from orders.models import OrderProduct
 
 
 # Create your views here.
@@ -46,9 +47,16 @@ def product_detail(request, category_slug, product_slug):
     except Exception as e:
         raise e
 
+    try:
+        orderproduct = orderProduct.objects.filter(user=request.user, product_id=single_product.id).exists()
+    except OrderProduct.DoesNotExist:
+        orderproduct = None
+
+
     context = {
         'single_product': single_product,
         'in_cart': in_cart,
+        'orderproduct': orderproduct,
     }
     return render(request, 'store/product_detail.html', context)
 
