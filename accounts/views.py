@@ -31,10 +31,17 @@ def register(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             username = email.split("@")[0]
-            user = account.object.create_user(first_name=first_name, last_name=last_name, email=email, username=username, password=password)
+            user = account.objects.create_user(first_name=first_name, last_name=last_name, email=email, username=username, password=password)
             user.phone_number = phone_number
             user.save()
-            # user activision
+
+            # Create a user profile
+            profile = UserProfile()
+            profile.user_id = user.id
+            profile.profile_picture = 'default/default-user.png'
+            profile.save()
+
+            # USER ACTIVATION
             current_site = get_current_site(request)
             mail_subject = 'Please activate your account'
             message = render_to_string('accounts/account_verification_email.html', {
@@ -46,10 +53,10 @@ def register(request):
             to_email = email
             send_email = EmailMessage(mail_subject, message, to=[to_email])
             send_email.send()
-            #messages.success(request, 'You have been sent a verfiaction email, please verify your email. ')
+            # messages.success(request, 'Thank you for registering with us. We have sent you a verification email to your email address [rathan.kumar@gmail.com]. Please verify it.')
             return redirect('/accounts/login/?command=verification&email='+email)
     else:
-        form = RegistrationForm()     
+        form = RegistrationForm()
     context = {
         'form': form,
     }
