@@ -156,6 +156,9 @@ EMAIL_HOST_USER = 'mustafanaji0413@gmail.com'
 EMAIL_HOST_PASSWORD = 'Ibbeibbe1'
 EMAIL_USE_TLS = 'True'
 
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
