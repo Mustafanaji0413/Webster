@@ -26,6 +26,14 @@ def payments(request):
     order.is_ordered = True
     order.save()
 
+    # move cart items to order product table 
+
+    # reduce quantity of the sold product 
+
+    # clear cart after checkout
+
+    # send confiramtion email to customer 
+
 
     return render(request, 'orders/payments.html')
 
