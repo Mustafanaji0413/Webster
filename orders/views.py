@@ -5,6 +5,9 @@ from .forms import OrderForm
 import datetime
 from .models import Order, Payment, OrderProduct
 import json
+from store.models import Product
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 
 
 def payments(request):
@@ -47,14 +50,24 @@ def payments(request):
         orderproduct.save()
 
 
-    # reduce quantity of the sold product 
+        # reduce quantity of the sold product 
+
+        product = Product.objects.get(id=item.product_id)
+        product.stock -= item.quantity
+        product.save()
 
     # clear cart after checkout
+    CartItem.objects.filter(user=request.user).delete()
 
     # send confiramtion email to customer 
-
-
-    return render(request, 'orders/payments.html')
+    mail_subject = 'Thank you for your order!'
+    message = render_to_string('orders/order_recieved_email.html', {
+        'user': request.user,
+        'order': order,
+    })
+    to_email = request.user.email
+    send_email = EmailMessage(mail_subject, message, to=[to_email])
+    send_email.send()
 
 
 def place_order(request, total=0, quantity=0,):
