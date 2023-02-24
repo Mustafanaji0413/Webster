@@ -7,13 +7,11 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 from django.http import HttpResponse
 
-
 def _cart_id(request):
     cart = request.session.session_key
     if not cart:
         cart = request.session.create()
     return cart
-
 
 def add_cart(request, product_id):
     current_user = request.user
@@ -32,13 +30,14 @@ def add_cart(request, product_id):
                 except:
                     pass
 
+
         is_cart_item_exists = CartItem.objects.filter(product=product, user=current_user).exists()
         if is_cart_item_exists:
             cart_item = CartItem.objects.filter(product=product, user=current_user)
             ex_var_list = []
             id = []
             for item in cart_item:
-                existing_variation = item.variation.all()
+                existing_variation = item.variations.all()
                 ex_var_list.append(list(existing_variation))
                 id.append(item.id)
 
@@ -58,9 +57,9 @@ def add_cart(request, product_id):
                 item.save()
         else:
             cart_item = CartItem.objects.create(
-                product=product,
-                quantity=1,
-                user=current_user,
+                product = product,
+                quantity = 1,
+                user = current_user,
             )
             if len(product_variation) > 0:
                 cart_item.variations.clear()
@@ -86,7 +85,7 @@ def add_cart(request, product_id):
             cart = Cart.objects.get(cart_id=_cart_id(request)) # get the cart using the cart_id present in the session
         except Cart.DoesNotExist:
             cart = Cart.objects.create(
-                cart_id=_cart_id(request)
+                cart_id = _cart_id(request)
             )
         cart.save()
 
@@ -99,7 +98,7 @@ def add_cart(request, product_id):
             ex_var_list = []
             id = []
             for item in cart_item:
-                existing_variation = item.variation.all()
+                existing_variation = item.variations.all()
                 ex_var_list.append(list(existing_variation))
                 id.append(item.id)
 
@@ -121,9 +120,9 @@ def add_cart(request, product_id):
                 item.save()
         else:
             cart_item = CartItem.objects.create(
-                product=product,
-                quantity=1,
-                cart=cart,
+                product = product,
+                quantity = 1,
+                cart = cart,
             )
             if len(product_variation) > 0:
                 cart_item.variations.clear()
@@ -183,12 +182,13 @@ def cart(request, total=0, quantity=0, cart_items=None):
         'total': total,
         'quantity': quantity,
         'cart_items': cart_items,
-        'tax': tax,
+        'tax'       : tax,
         'grand_total': grand_total,
     }
     return render(request, 'store/cart.html', context)
 
 
+@login_required(login_url='login')
 def checkout(request, total=0, quantity=0, cart_items=None):
     try:
         tax = 0
@@ -204,7 +204,7 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         tax = (2 * total)/100
         grand_total = total + tax
     except ObjectDoesNotExist:
-        pass
+        pass #just ignore
 
     context = {
         'total': total,
@@ -212,7 +212,5 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         'cart_items': cart_items,
         'tax': tax,
         'grand_total': grand_total,
-        'stripe_public_key': 'pk_test_51MeTmsLQ9eKdyL2rTjk5vewWtcciAOqsCz6dThkeGALGpkAQB1ysvvFb7FzMFe0bq5I3tnQj8DiqsyMMZGjoiqET00dj34YIVq',
-        'client_secret': 'test client secret',
     }
     return render(request, 'store/checkout.html', context)

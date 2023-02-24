@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from carts.models import CartItem
 from .forms import OrderForm
 import datetime
@@ -14,23 +14,22 @@ def payments(request):
     body = json.loads(request.body)
     order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
 
-    #Store transaction details inside payment model
-
+    # Store transaction details inside Payment model
     payment = Payment(
-        user=request.user, 
-        payment_id=body['transID'],
-        payment_method=body['payment_method'],
-        amount_paid=order.order_total,
-        status=body['status'],
+        user = request.user,
+        payment_id = body['transID'],
+        payment_method = body['payment_method'],
+        amount_paid = order.order_total,
+        status = body['status'],
     )
-    payment.save
+    payment.save()
 
     order.payment = payment
     order.is_ordered = True
     order.save()
 
-    # moving the cart items to the order product table 
-    cart_item = CartItem.objects.filter(user=request.user)
+    # Move the cart items to Order Product table
+    cart_items = CartItem.objects.filter(user=request.user)
 
     for item in cart_items:
         orderproduct = OrderProduct()
@@ -50,16 +49,15 @@ def payments(request):
         orderproduct.save()
 
 
-        # reduce quantity of the sold product 
-
+        # Reduce the quantity of the sold products
         product = Product.objects.get(id=item.product_id)
         product.stock -= item.quantity
         product.save()
 
-    # clear cart after checkout
+    # Clear cart
     CartItem.objects.filter(user=request.user).delete()
 
-    # send confiramtion email to customer 
+    # Send order recieved email to customer
     mail_subject = 'Thank you for your order!'
     message = render_to_string('orders/order_recieved_email.html', {
         'user': request.user,
@@ -76,7 +74,6 @@ def payments(request):
     }
     return JsonResponse(data)
 
-
 def place_order(request, total=0, quantity=0,):
     current_user = request.user
 
@@ -85,6 +82,7 @@ def place_order(request, total=0, quantity=0,):
     cart_count = cart_items.count()
     if cart_count <= 0:
         return redirect('store')
+
     grand_total = 0
     tax = 0
     for cart_item in cart_items:
@@ -117,8 +115,8 @@ def place_order(request, total=0, quantity=0,):
             yr = int(datetime.date.today().strftime('%Y'))
             dt = int(datetime.date.today().strftime('%d'))
             mt = int(datetime.date.today().strftime('%m'))
-            d = datetime.date(yr, mt, dt)
-            current_date = d.strftime("%Y%m%d") 
+            d = datetime.date(yr,mt,dt)
+            current_date = d.strftime("%Y%m%d") #20210305
             order_number = current_date + str(data.id)
             data.order_number = order_number
             data.save()
@@ -130,10 +128,11 @@ def place_order(request, total=0, quantity=0,):
                 'total': total,
                 'tax': tax,
                 'grand_total': grand_total,
-            } 
+            }
             return render(request, 'orders/payments.html', context)
     else:
         return redirect('checkout')
+
 
 def order_complete(request):
     order_number = request.GET.get('order_number')
@@ -160,5 +159,3 @@ def order_complete(request):
         return render(request, 'orders/order_complete.html', context)
     except (Payment.DoesNotExist, Order.DoesNotExist):
         return redirect('home')
-
-
