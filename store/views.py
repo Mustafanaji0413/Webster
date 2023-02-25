@@ -4,6 +4,7 @@ from .models import Product, ReviewRating, ProductGallery
 from category.models import Category
 from carts.models import CartItem
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 from carts.views import _cart_id
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -11,6 +12,7 @@ from django.http import HttpResponse
 from .forms import ReviewForm
 from django.contrib import messages
 from orders.models import OrderProduct
+from .forms import ProductForm
 
 
 def store(request, category_slug=None):
@@ -104,3 +106,31 @@ def submit_review(request, product_id):
                 data.save()
                 messages.success(request, 'Thank you! Your review has been submitted.')
                 return redirect(url)
+
+
+@login_required
+def add_product(request):
+    """ Add a product to the store """
+    if not request.user.is_superuser:
+        messages.error(request, 'Sorry, only store owners can do that.')
+        return redirect(reverse('home'))
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save()
+            messages.success(request, 'Successfully added product!')
+            return redirect(reverse('add_product', args=[product.id]))
+        else:
+            messages.error(request,
+                           ('Failed to add product. '
+                            'Please ensure the form is valid.'))
+    else:
+        form = ProductForm()
+
+    template = 'templates/add_product.html'
+    context = {
+        'form': form,
+    }
+
+    return render(request, template, context)
