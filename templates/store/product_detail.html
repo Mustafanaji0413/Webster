@@ -12,7 +12,11 @@
 				<aside class="col-md-6">
 					<article class="gallery-wrap">
 						<div class="img-big-wrap mainImage">
+							{% if item.product.image %}
 							<center><img src="{{ single_product.images.url }}"></center>
+							{% else %}
+							<center><img src="{{ MEDIA_URL }}noimage.png"></center>
+							{% endif %}
 						</div> <!-- img-big-wrap.// -->
 
 					</article> <!-- gallery-wrap .end// -->
