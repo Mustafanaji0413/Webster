@@ -193,7 +193,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Stripe
+# Paypal
 PAYPAL_PUBLIC_KEY = os.getenv('PAYPAL_PUBLIC_KEY', '')
 PAYPAL_SECRET_KEY = os.getenv('PAYPAL_SECRET_KEY', '')
 PAYPAL_WH_ID = os.getenv('PAYPAL_WH_ID', '')
