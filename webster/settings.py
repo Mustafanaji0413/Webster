@@ -181,11 +181,11 @@ if 'USE_AWS' in os.environ:
 
 
 # SMTP config
-EMAIL_HOST = 'smpt.gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'mustafanaji0413@gmail.com'
-EMAIL_HOST_PASSWORD = 'Ibbeibbe1'
-EMAIL_USE_TLS = 'True'
+EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = 'hsybhukyqhhvwumi'
 
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
@@ -200,6 +200,7 @@ PAYPAL_PUBLIC_KEY = os.getenv('PAYPAL_PUBLIC_KEY', '')
 PAYPAL_SECRET_KEY = os.getenv('PAYPAL_SECRET_KEY', '')
 PAYPAL_WH_ID = os.getenv('PAYPAL_WH_ID', '')
 
+
 if 'DEVELOPMENT' in os.environ:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     DEFAULT_FROM_EMAIL = 'webster@example.com'
@@ -209,5 +210,4 @@ else:
     EMAIL_PORT = 587
     EMAIL_HOST = 'smtp.gmail.com'
     EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASS')
     DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')
